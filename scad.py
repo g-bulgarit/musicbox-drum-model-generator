@@ -17,8 +17,11 @@ class SCADHeader:
     bump_radius__mm: float
     bump_height__mm: float
 
+    number_of_drawing_fragments: int = 128
+
     def __str__(self) -> str:
         return f"""
+$fn={self.number_of_drawing_fragments};
 TRACK_LENGTH = {self.number_of_notes_in_track};
 NUM_TRACKS = {self.number_of_tracks};
 CYLINDER_RADIUS = {self.cylinder_radius__mm};

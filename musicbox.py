@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from pathlib import Path
 import pretty_midi
+import numpy as np
+from scad import SCADTrack, SCADHeader, SCADFile, SCADTracks
 
 
 midi_file = Path("assets/test.mid")
@@ -40,28 +42,72 @@ print(notes_list)
 
 print(get_note_range(notes).in_semitones())
 
+DEFAULT_TICK_LENGTH__SEC = 0.5
 
-@dataclass
-class SCADHeader:
-    number_of_tracks: int
-    number_of_notes_in_track: int
 
-    cylinder_radius__mm: float
-    cylinder_height__mm: float
-    distance_between_tracks__mm: float
-    offset_of_tracks_from_edge__mm: float
+class TickNote:
+    def __init__(self, note: pretty_midi.Note, start_tick: int) -> None:
+        self.pitch = note.pitch
+        self.start_tick = start_tick
 
-    bump_radius__mm: float
-    bump_height__mm: float
+    def __repr__(self) -> str:
+        return f"{self.pitch} ({self.start_tick})"
 
-    def __str__(self) -> str:
-        return f"""
-        TRACK_LENGTH = {self.number_of_notes_in_track};
-        NUM_TRACKS = {self.number_of_tracks};
-        CYLINDER_RADIUS = {self.cylinder_radius__mm};
-        CYLINDER_HEIGHT = {self.cylinder_height__mm};
-        PROTRUSION_RADIUS = {self.bump_radius__mm};
-        PROTRUSION_HEIGHT = {self.bump_height__mm};
-        TRACK_TO_TRACK_DISTANCE = {self.distance_between_tracks__mm};
-        EDGE_OFFSET = {self.offset_of_tracks_from_edge__mm};
-        """
+    @classmethod
+    def from_note(
+        cls, note: pretty_midi.Note, tick_length__sec: float = DEFAULT_TICK_LENGTH__SEC
+    ) -> "TickNote":
+        tick = int(note.start / tick_length__sec)
+        return TickNote(note, start_tick=tick)
+
+
+class Melody:
+    def __init__(self, note_array: list[TickNote], ticks: int) -> None:
+        self.note_array = note_array
+        self.ticks = ticks
+        self.distinct_pitches = self.get_distinct_pitches()
+
+    def get_distinct_pitches(self) -> list[int]:
+        return sorted(set(note.pitch for note in self.note_array))
+
+    def create_tracks(self) -> dict[int, list]:
+        arrays: dict[int, list] = dict()
+        for pitch in self.get_distinct_pitches():
+            relevant_ticks = [
+                note.start_tick for note in self.note_array if note.pitch == pitch
+            ]
+            arr = np.zeros(ticks, dtype=int)
+            for tick in relevant_ticks:
+                arr[tick] = 1
+            arrays[pitch] = arr.tolist()
+        return arrays
+
+
+ticks = int(length__sec / DEFAULT_TICK_LENGTH__SEC)
+
+tick_notes = [TickNote.from_note(note) for note in notes]
+mel = Melody(tick_notes, ticks)
+arrs = mel.create_tracks()
+
+track_names: list[str] = list()
+tracks: list[SCADTrack] = list()
+
+for pitch, content in arrs.items():
+    track_name = f"t{pitch}"
+    track_names.append(track_name)
+    tracks.append(SCADTrack(track_name=track_name, track_content=content))
+
+scad_tracks = SCADTracks(tracks)
+
+header = SCADHeader(
+    number_of_tracks=len(tracks),
+    number_of_notes_in_track=ticks,
+    cylinder_radius__mm=25,
+    cylinder_height__mm=40,
+    distance_between_tracks__mm=2,
+    offset_of_tracks_from_edge__mm=2,
+    bump_radius__mm=1,
+    bump_height__mm=1,
+)
+
+SCADFile(header, scad_tracks).to_file("output2.scad")

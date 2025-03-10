@@ -60,7 +60,7 @@ class SCADFile:
     tracks: SCADTracks
     content: str = SCAD_FILE_CONTENT
 
-    def to_file(self, filepath: Path):
+    def to_file(self, filepath: Path | str):
         with Path(filepath).open("w+") as output_file:
             output_file.write(str(self.header))
             output_file.write(str(self.tracks))

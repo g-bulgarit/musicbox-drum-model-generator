@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 SCAD_FILE_CONTENT = Path("music_box.scad").read_text()
@@ -10,7 +10,7 @@ class SCADHeader:
     number_of_notes_in_track: int
 
     cylinder_radius__mm: float
-    cylinder_height__mm: float
+    cylinder_height__mm: float = field(init=False)
     distance_between_tracks__mm: float
     offset_of_tracks_from_edge__mm: float
 
@@ -18,6 +18,12 @@ class SCADHeader:
     bump_height__mm: float
 
     number_of_drawing_fragments: int = 128
+
+    def __post_init__(self) -> None:
+        self.cylinder_height__mm = (
+            self.number_of_tracks * self.distance_between_tracks__mm
+            + self.offset_of_tracks_from_edge__mm
+        )
 
     def __str__(self) -> str:
         return f"""

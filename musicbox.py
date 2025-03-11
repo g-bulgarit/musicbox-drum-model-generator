@@ -5,12 +5,12 @@ from musical_containers import Melody
 from scad import SCADTrack, SCADHeader, SCADTracks, SCADFile
 
 
-class DrumBuilder:
+class MusicBoxBuilder:
     @classmethod
-    def from_midi(cls, midi_filepath: Path | str) -> "DrumBuilder":
+    def from_midi(cls, midi_filepath: Path | str) -> "MusicBoxBuilder":
         midi_content = pretty_midi.PrettyMIDI(str(midi_filepath))
         instrument = midi_content.instruments[0]
-        return DrumBuilder(notes=instrument.notes)
+        return MusicBoxBuilder(notes=instrument.notes)
 
     def __init__(self, notes: list[pretty_midi.Note]) -> None:
         self.melody = Melody(notes)
@@ -41,11 +41,7 @@ class DrumBuilder:
         return SCADFile(header, tracks)
 
 
-def construct_scad_file(notes) -> int:
-    return 65
-
-
 if __name__ == "__main__":
-    drum = DrumBuilder.from_midi(Path("assets/entertainer.mid"))
+    drum = MusicBoxBuilder.from_midi(Path("assets/entertainer.mid"))
     scad_code = drum.build()
     scad_code.to_file("test.scad")

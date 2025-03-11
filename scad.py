@@ -10,7 +10,9 @@ class SCADHeader:
     number_of_notes_in_track: int
 
     cylinder_radius__mm: float
+    inner_cylinder_radius__mm: float
     cylinder_height__mm: float = field(init=False)
+    inner_cylinder_height__mm: float = field(init=False)
     distance_between_tracks__mm: float
     offset_of_tracks_from_edge__mm: float
 
@@ -24,6 +26,7 @@ class SCADHeader:
             self.number_of_tracks * self.distance_between_tracks__mm
             + self.offset_of_tracks_from_edge__mm
         )
+        self.inner_cylinder_height__mm = self.cylinder_height__mm * 2
 
     def __str__(self) -> str:
         return f"""
@@ -31,7 +34,9 @@ $fn={self.number_of_drawing_fragments};
 TRACK_LENGTH = {self.number_of_notes_in_track};
 NUM_TRACKS = {self.number_of_tracks};
 CYLINDER_RADIUS = {self.cylinder_radius__mm};
+INNER_CYLINDER_RADIUS = {self.inner_cylinder_radius__mm};
 CYLINDER_HEIGHT = {self.cylinder_height__mm};
+INNER_CYLINDER_HEIGHT = {self.inner_cylinder_height__mm};
 PROTRUSION_RADIUS = {self.bump_radius__mm};
 PROTRUSION_HEIGHT = {self.bump_height__mm};
 TRACK_TO_TRACK_DISTANCE = {self.distance_between_tracks__mm};

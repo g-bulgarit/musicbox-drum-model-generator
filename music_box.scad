@@ -6,7 +6,12 @@ module protrusion(angle, height) {
 }
 
 module music_box_cylinder() {
-    cylinder(h = CYLINDER_HEIGHT, r = CYLINDER_RADIUS);
+    difference () {
+        cylinder(h = CYLINDER_HEIGHT, r = CYLINDER_RADIUS);
+        translate([0,0,-1])
+
+        cylinder(h = INNER_CYLINDER_HEIGHT, r = INNER_CYLINDER_RADIUS);
+    }
     
     for (track = [0 : NUM_TRACKS - 1]) {
         for (i = [0 : TRACK_LENGTH - 1]) {

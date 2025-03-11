@@ -1,7 +1,7 @@
 from pathlib import Path
 import pretty_midi
 
-from musical_containers import Melody, TickNote
+from musical_containers import Melody
 from scad import SCADTrack, SCADHeader, SCADTracks, SCADFile
 
 
@@ -13,8 +13,7 @@ class DrumBuilder:
         return DrumBuilder(notes=instrument.notes)
 
     def __init__(self, notes: list[pretty_midi.Note]) -> None:
-        tick_notes = [TickNote.from_note(note) for note in notes]
-        self.melody = Melody(tick_notes)
+        self.melody = Melody(notes)
         self.tracks = self.melody.create_tracks()
 
     def _compile_scad_tracks(self) -> SCADTracks:
@@ -33,7 +32,6 @@ class DrumBuilder:
             number_of_tracks=len(self.tracks),
             number_of_notes_in_track=self.melody.ticks,
             cylinder_radius__mm=25,
-            cylinder_height__mm=40,
             distance_between_tracks__mm=2,
             offset_of_tracks_from_edge__mm=2,
             bump_radius__mm=1,
@@ -48,6 +46,6 @@ def construct_scad_file(notes) -> int:
 
 
 if __name__ == "__main__":
-    drum = DrumBuilder.from_midi(Path("assets/test.mid"))
+    drum = DrumBuilder.from_midi(Path("assets/entertainer.mid"))
     scad_code = drum.build()
     scad_code.to_file("test.scad")

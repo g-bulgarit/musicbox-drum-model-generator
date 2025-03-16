@@ -16,7 +16,7 @@ module music_box_cylinder() {
     for (track = [0 : NUM_TRACKS - 1]) {
         for (i = [0 : TRACK_LENGTH - 1]) {
             if (TRACKS[track][i] == 1) {
-                protrusion(i * (360 / TRACK_LENGTH), EDGE_OFFSET + track * (TRACK_TO_TRACK_DISTANCE));
+                protrusion(i * (360 / TRACK_LENGTH), EDGE_OFFSET + track * ((PROTRUSION_RADIUS * 2) + TRACK_TO_TRACK_DISTANCE));
             }
         }
     }

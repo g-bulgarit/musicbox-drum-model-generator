@@ -31,18 +31,18 @@ class MusicBoxBuilder:
         header = SCADHeader(
             number_of_tracks=len(self.tracks),
             number_of_notes_in_track=self.melody.ticks,
-            cylinder_radius__mm=6,
+            cylinder_radius__mm=7,
             inner_cylinder_radius__mm=2,
-            distance_between_tracks__mm=0.5,
-            offset_of_tracks_from_edge__mm=0.5,
-            bump_radius__mm=0.2,
-            bump_height__mm=0.2,
+            distance_between_tracks__mm=0.2,
+            offset_of_tracks_from_edge__mm=2,
+            bump_radius__mm=0.25,
+            bump_height__mm=0.4,
         )
         tracks = self._compile_scad_tracks()
         return SCADFile(header, tracks)
 
 
 if __name__ == "__main__":
-    drum = MusicBoxBuilder.from_midi(Path("assets/entertainer_double.mid"))
+    drum = MusicBoxBuilder.from_midi(Path("assets/nothing_arranged_small.mid"))
     scad_code = drum.build()
     scad_code.to_file("test.scad")

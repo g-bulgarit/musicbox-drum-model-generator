@@ -22,10 +22,9 @@ class SCADHeader:
     number_of_drawing_fragments: int = 128
 
     def __post_init__(self) -> None:
-        self.cylinder_height__mm = (
-            self.number_of_tracks * self.distance_between_tracks__mm
-            + self.offset_of_tracks_from_edge__mm
-        )
+        self.cylinder_height__mm = self.number_of_tracks * (
+            self.distance_between_tracks__mm + (self.bump_radius__mm * 2)
+        ) + (self.offset_of_tracks_from_edge__mm * 2)
         self.inner_cylinder_height__mm = self.cylinder_height__mm * 2
 
     def __str__(self) -> str:
